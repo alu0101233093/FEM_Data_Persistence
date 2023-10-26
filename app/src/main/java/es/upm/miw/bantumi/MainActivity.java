@@ -17,7 +17,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -110,6 +109,33 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public void RestoreMatch(){
+        try {
+            BufferedReader fin = new BufferedReader(new InputStreamReader(openFileInput("match.txt")));
+            String turn = fin.readLine();
+            switch (turn) {
+                case "turnoJ1":
+                    juegoBantumi.setTurno(JuegoBantumi.Turno.turnoJ1);
+                    break;
+                case "turnoJ2":
+                    juegoBantumi.setTurno(JuegoBantumi.Turno.turnoJ2);
+                    break;
+                default:
+                    throw new RuntimeException("No se ha podido leer el turno");
+            }
+            for(int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
+                juegoBantumi.setSemillas(i,Integer.parseInt(fin.readLine()));
+            }
+            Snackbar.make(
+                    findViewById(android.R.id.content),
+                    R.string.txtPartidaCargada,
+                    Snackbar.LENGTH_LONG
+            ).show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @SuppressLint("NonConstantResourceId")
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -122,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.opcGuardarPartida:
                 StringBuilder match = new StringBuilder(juegoBantumi.turnoActual().toString() + "\n");
                 for(int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
-                    match.append(juegoBantumi.getSemillas(i)).append(" ");
+                    match.append(juegoBantumi.getSemillas(i)).append("\n");
                 }
                 FileOutputStream fos;
                 try {
@@ -131,20 +157,15 @@ public class MainActivity extends AppCompatActivity {
                     fos.close();
                     Snackbar.make(
                         findViewById(android.R.id.content),
-                        "Partida guardada",
+                        R.string.txtPartidaGuardada,
                         Snackbar.LENGTH_LONG
-                    )
-                    .show();
+                    ).show();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 return true;
             case R.id.opcRecuperarPartida:
-                try {
-                    BufferedReader fin = new BufferedReader(new InputStreamReader(openFileInput("match.txt")));
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
+                new RestoreAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
                 return true;
             case R.id.opcAcercaDe:
                 new AlertDialog.Builder(this)
