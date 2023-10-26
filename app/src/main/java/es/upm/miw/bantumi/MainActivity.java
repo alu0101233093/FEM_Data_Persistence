@@ -1,6 +1,8 @@
 package es.upm.miw.bantumi;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -10,11 +12,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Locale;
 
 import es.upm.miw.bantumi.model.BantumiViewModel;
@@ -47,21 +53,11 @@ public class MainActivity extends AppCompatActivity {
             int finalI = i;
             bantumiVM.getNumSemillas(i).observe(    // Huecos y almacenes
                     this,
-                    new Observer<Integer>() {
-                        @Override
-                        public void onChanged(Integer integer) {
-                            mostrarValor(finalI, juegoBantumi.getSemillas(finalI));
-                        }
-                    });
+                    integer -> mostrarValor(finalI, juegoBantumi.getSemillas(finalI)));
         }
         bantumiVM.getTurno().observe(   // Turno
                 this,
-                new Observer<JuegoBantumi.Turno>() {
-                    @Override
-                    public void onChanged(JuegoBantumi.Turno turno) {
-                        marcarTurno(juegoBantumi.turnoActual());
-                    }
-                }
+                turno -> marcarTurno(juegoBantumi.turnoActual())
         );
     }
 
@@ -114,11 +110,42 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
 //            case R.id.opcAjustes: // @todo Preferencias
 //                startActivity(new Intent(this, BantumiPrefs.class));
 //                return true;
+            case R.id.opcReiniciarPartida:
+                new ResetAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
+                return true;
+            case R.id.opcGuardarPartida:
+                StringBuilder match = new StringBuilder(juegoBantumi.turnoActual().toString() + "\n");
+                for(int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
+                    match.append(juegoBantumi.getSemillas(i)).append(" ");
+                }
+                FileOutputStream fos;
+                try {
+                    fos = openFileOutput("match.txt", Context.MODE_PRIVATE);
+                    fos.write(match.toString().getBytes());
+                    fos.close();
+                    Snackbar.make(
+                        findViewById(android.R.id.content),
+                        "Partida guardada",
+                        Snackbar.LENGTH_LONG
+                    )
+                    .show();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return true;
+            case R.id.opcRecuperarPartida:
+                try {
+                    BufferedReader fin = new BufferedReader(new InputStreamReader(openFileInput("match.txt")));
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                return true;
             case R.id.opcAcercaDe:
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.aboutTitle)
