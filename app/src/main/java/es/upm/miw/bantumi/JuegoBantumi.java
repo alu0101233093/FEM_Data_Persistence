@@ -192,8 +192,11 @@ public class JuegoBantumi {
      * @return juego serializado
      */
     public String serializa() {
-        // @TODO
-        return null;
+        StringBuilder match = new StringBuilder(this.turnoActual().toString() + "\n");
+        for(int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
+            match.append(this.getSemillas(i)).append("\n");
+        }
+        return match.toString();
     }
 
     /**

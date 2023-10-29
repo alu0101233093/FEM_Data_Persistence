@@ -49,5 +49,11 @@
     <string name="txtReiniciarPartidaPregunta">¿Desea reiniciar la partida?</string>
     <string name="txtPartidaGuardada">Partida guardada</string>
     <string name="txtPartidaCargada">Partida cargada</string>
+    <string name="tittleScores">Puntuaciones</string>
+    <string name="scoresBtnBack">Volver</string>
+    <string name="scoresBtnDelete">Borrar</string>
+    <string name="ScoresDateColumn">Fecha</string>
+    <string name="scoresPlayerNameColumn">Nombre del jugador</string>
+    <string name="scoresScoreColumn">Puntuación</string>
 
 </resources>

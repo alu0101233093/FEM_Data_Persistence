@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ScoresActivity">
+
+    <LinearLayout
+        app:layout_constraintBottom_toTopOf="@id/header"
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/exitScores"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="10dp"
+            android:layout_weight="1"
+            android:text="@string/scoresBtnBack"
+            tools:ignore="TextContrastCheck"></Button>
+
+        <TextView
+            android:id="@+id/tittle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:orientation="horizontal"
+            android:text="@string/tittleScores"
+            android:textAlignment="center"
+            android:textSize="30sp"
+            android:textStyle="bold"/>
+
+        <Button
+            android:id="@+id/deleteScores"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="10dp"
+            android:layout_weight="1"
+            android:text="@string/scoresBtnDelete"
+            tools:ignore="TextContrastCheck"></Button>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/top"
+        android:orientation="horizontal">
+
+        <!-- Fecha y Hora -->
+        <TextView
+            android:id="@+id/textViewDate"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_weight="1"
+            android:text="@string/ScoresDateColumn"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:ignore="TextSizeCheck" />
+
+        <!-- Nombre del Jugador -->
+        <TextView
+            android:id="@+id/textViewPlayerName"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_weight="2"
+            android:text="@string/scoresPlayerNameColumn"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:ignore="TextSizeCheck" />
+
+        <!-- Puntuación -->
+        <TextView
+            android:id="@+id/textViewScore"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_weight="1"
+            android:text="@string/scoresScoreColumn"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:ignore="TextSizeCheck" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="10dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header"
+        tools:listitem="@layout/item_score" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

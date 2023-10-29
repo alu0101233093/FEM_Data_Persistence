@@ -3,6 +3,7 @@ package es.upm.miw.bantumi;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,8 +21,12 @@ import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import es.upm.miw.bantumi.model.ScoreViewModel;
+import es.upm.miw.bantumi.model.Score;
 import es.upm.miw.bantumi.model.BantumiViewModel;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     JuegoBantumi juegoBantumi;
     BantumiViewModel bantumiVM;
     int numInicialSemillas;
+
+    ScoreViewModel scoreViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("NonConstantResourceId")
+    @SuppressLint({"NonConstantResourceId", "StaticFieldLeak"})
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
 //            case R.id.opcAjustes: // @todo Preferencias
@@ -146,14 +153,10 @@ public class MainActivity extends AppCompatActivity {
                 new ResetAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
                 return true;
             case R.id.opcGuardarPartida:
-                StringBuilder match = new StringBuilder(juegoBantumi.turnoActual().toString() + "\n");
-                for(int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
-                    match.append(juegoBantumi.getSemillas(i)).append("\n");
-                }
                 FileOutputStream fos;
                 try {
                     fos = openFileOutput("match.txt", Context.MODE_PRIVATE);
-                    fos.write(match.toString().getBytes());
+                    fos.write(this.juegoBantumi.serializa().getBytes());
                     fos.close();
                     Snackbar.make(
                         findViewById(android.R.id.content),
@@ -167,6 +170,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.opcRecuperarPartida:
                 new RestoreAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
                 return true;
+            case R.id.opcMejoresResultados:
+                Intent intent = new Intent(MainActivity.this, ScoresActivity.class);
+                startActivity(intent);
+                return true;
             case R.id.opcAcercaDe:
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.aboutTitle)
@@ -174,9 +181,6 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
                 return true;
-
-            // @TODO!!! resto opciones
-
             default:
                 Snackbar.make(
                         findViewById(android.R.id.content),
@@ -230,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * El juego ha terminado. Volver a jugar?
      */
+    @SuppressLint("StaticFieldLeak")
     private void finJuego() {
         String texto = (juegoBantumi.getSemillas(6) > 6 * numInicialSemillas)
                 ? "Gana Jugador 1"
@@ -238,15 +243,40 @@ public class MainActivity extends AppCompatActivity {
             texto = "¡¡¡ EMPATE !!!";
         }
         Snackbar.make(
-                findViewById(android.R.id.content),
-                texto,
-                Snackbar.LENGTH_LONG
-        )
-        .show();
+                        findViewById(android.R.id.content),
+                        texto,
+                        Snackbar.LENGTH_LONG
+                )
+                .show();
 
-        // @TODO guardar puntuación
+        String formattedDateTime = "";
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            formattedDateTime = currentDateTime.format(formatter);
+        }
+        String winner = getString((juegoBantumi.getSemillas(6) > 6 * numInicialSemillas)
+                ? R.string.txtPlayer1
+                : R.string.txtPlayer2);
 
+        Integer seeds = (juegoBantumi.getSemillas(6) > 6 * numInicialSemillas)
+                ? juegoBantumi.getSemillas(6)
+                : juegoBantumi.getSemillas(13);
+
+        final String finalFormattedDateTime = formattedDateTime;
+        final String finalWinner = winner;
+        final Integer finalSeeds = seeds;
+
+        Score score = new Score(finalFormattedDateTime, finalWinner, finalSeeds);
+        scoreViewModel = new ViewModelProvider(this).get(ScoreViewModel.class);
+        try {
+            scoreViewModel.insert(score);
+        }catch (Exception e) {
+            Log.e("MiW","ERROR" + e.getMessage());
+            e.printStackTrace();
+        }
         // terminar
         new FinalAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
     }
+
 }
