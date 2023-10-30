@@ -39,4 +39,6 @@ dependencies {
 
     implementation "androidx.room:room-runtime:2.4.0" // Asegúrate de usar la versión más reciente de Room
     annotationProcessor "androidx.room:room-compiler:2.4.0" // Asegúrate de usar la misma versión que la anterior
+
+    implementation "androidx.preference:preference:$preferenceVersion"
 }

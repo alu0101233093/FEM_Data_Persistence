@@ -23,4 +23,8 @@ public class ScoreRepository {
     void insert(Score score) {
         ScoreRoomDatabase.databaseWriteExecutor.execute(() -> mScoreDao.insert(score));
     }
+
+    void deleteAll() {
+        ScoreRoomDatabase.databaseWriteExecutor.execute(() -> mScoreDao.deleteAll());
+    }
 }

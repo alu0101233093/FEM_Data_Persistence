@@ -25,4 +25,8 @@ public class ScoreViewModel extends AndroidViewModel {
     public void insert(Score score) {
         mRepository.insert(score);
     }
+
+    public void deleteAll(){
+        mRepository.deleteAll();
+    }
 }

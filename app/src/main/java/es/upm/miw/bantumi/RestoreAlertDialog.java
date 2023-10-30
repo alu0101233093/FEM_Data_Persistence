@@ -16,15 +16,15 @@ public class RestoreAlertDialog extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(main);
         builder
-                .setTitle(R.string.txtReiniciarPartida)
-                .setMessage(R.string.txtReiniciarPartidaPregunta)
+                .setTitle(R.string.txtRecuperarPartida)
+                .setMessage(R.string.txtRecuperarPartidaPregunta)
                 .setPositiveButton(
                         getString(android.R.string.ok),
                         (dialog, which) -> main.RestoreMatch()
                 )
                 .setNegativeButton(
                         getString(android.R.string.cancel),
-                        (dialog, which) -> main.finish()
+                        (dialog, which) -> {}
                 );
 		return builder.create();
 	}

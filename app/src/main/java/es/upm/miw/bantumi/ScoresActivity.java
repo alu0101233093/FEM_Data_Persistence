@@ -28,7 +28,10 @@ public class ScoresActivity extends AppCompatActivity {
 
         scoreViewModel.getAllScores().observe(this, adapter::submitList);
 
-        final Button button = findViewById(R.id.exitScores);
-        button.setOnClickListener(view -> finish());
+        final Button deleteButton = findViewById(R.id.deleteScores);
+        deleteButton.setOnClickListener(view -> new DeleteAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG"));
+
+        final Button exitButton = findViewById(R.id.exitScores);
+        exitButton.setOnClickListener(view -> finish());
     }
 }

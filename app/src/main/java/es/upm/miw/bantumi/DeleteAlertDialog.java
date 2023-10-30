@@ -7,20 +7,21 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialog;
 import androidx.fragment.app.DialogFragment;
 
-public class ResetAlertDialog extends DialogFragment {
+
+public class DeleteAlertDialog extends DialogFragment {
 
     @NonNull
     @Override
 	public AppCompatDialog onCreateDialog(Bundle savedInstanceState) {
-		final MainActivity main = (MainActivity) requireActivity();
+		final ScoresActivity scores = (ScoresActivity) requireActivity();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(main);
+        AlertDialog.Builder builder = new AlertDialog.Builder(scores);
         builder
-                .setTitle(R.string.txtReiniciarPartida)
-                .setMessage(R.string.txtReiniciarPartidaPregunta)
+                .setTitle(R.string.txtBorrarPuntuaciones)
+                .setMessage(R.string.txtBorrarPuntuacionesPregunta)
                 .setPositiveButton(
                         getString(android.R.string.ok),
-                        (dialog, which) -> main.juegoBantumi.inicializar(JuegoBantumi.Turno.turnoJ1)
+                        (dialog, which) -> scores.scoreViewModel.deleteAll()
                 )
                 .setNegativeButton(
                         getString(android.R.string.cancel),

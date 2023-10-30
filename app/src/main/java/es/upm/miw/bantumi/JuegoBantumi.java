@@ -199,12 +199,4 @@ public class JuegoBantumi {
         return match.toString();
     }
 
-    /**
-     * Recupera el estado del juego a partir de su representación
-     *
-     * @param juegoSerializado cadena que representa el estado completo del juego
-     */
-    public void deserializa(String juegoSerializado) {
-        // @TODO
-    }
 }

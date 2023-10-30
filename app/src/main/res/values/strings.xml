@@ -55,5 +55,12 @@
     <string name="ScoresDateColumn">Fecha</string>
     <string name="scoresPlayerNameColumn">Nombre del jugador</string>
     <string name="scoresScoreColumn">Puntuación</string>
+    <string name="txtBorrarPuntuaciones">Borrar puntuaciones</string>
+    <string name="txtBorrarPuntuacionesPregunta">¿Desea borrar las puntuaciones?</string>
+    <string name="txtRecuperarPartida">Recuperar Partida</string>
+    <string name="txtRecuperarPartidaPregunta">¿Desea recuperar la partida guardada?</string>
+    <string name="settingsNamePlayer1">Nombre jugador 1</string>
+    <string name="settingsNamesTittle">Nombres</string>
+    <string name="settingsNamePlayer2">Nombre jugador 2</string>
 
 </resources>

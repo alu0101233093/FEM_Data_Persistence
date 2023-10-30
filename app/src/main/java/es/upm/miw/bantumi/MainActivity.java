@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -31,23 +33,48 @@ import es.upm.miw.bantumi.model.BantumiViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
-    protected final String LOG_TAG = "MiW";
+    public static final String LOG_TAG = "MiW";
     JuegoBantumi juegoBantumi;
     BantumiViewModel bantumiVM;
     int numInicialSemillas;
-
     ScoreViewModel scoreViewModel;
+    SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Instancia el ViewModel y el juego, y asigna observadores a los huecos
         numInicialSemillas = getResources().getInteger(R.integer.intNumInicialSemillas);
         bantumiVM = new ViewModelProvider(this).get(BantumiViewModel.class);
         juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turno.turnoJ1, numInicialSemillas);
         crearObservadores();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String newPlayer1 = this.preferences.getString(
+                "namePlayer1",
+                getString(R.string.txtPlayer1)
+        );
+        String newPlayer2 = this.preferences.getString(
+                "namePlayer2",
+                getString(R.string.txtPlayer2)
+        );
+
+        Log.i(LOG_TAG, "namePlayer1 = " + newPlayer1);
+        Log.i(LOG_TAG, "namePlayer2 = " + newPlayer2);
+
+        TextView textViewPlayer1 = findViewById(R.id.tvPlayer1);
+        TextView textViewPlayer2 = findViewById(R.id.tvPlayer2);
+
+        textViewPlayer1.setText(newPlayer1);
+        textViewPlayer2.setText(newPlayer2);
+
     }
 
     /**
@@ -146,9 +173,9 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint({"NonConstantResourceId", "StaticFieldLeak"})
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-//            case R.id.opcAjustes: // @todo Preferencias
-//                startActivity(new Intent(this, BantumiPrefs.class));
-//                return true;
+            case R.id.opcAjustes:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
             case R.id.opcReiniciarPartida:
                 new ResetAlertDialog().show(getSupportFragmentManager(), "ALERT_DIALOG");
                 return true;
@@ -236,9 +263,20 @@ public class MainActivity extends AppCompatActivity {
      */
     @SuppressLint("StaticFieldLeak")
     private void finJuego() {
+
+        String namePlayer1 = this.preferences.getString(
+                "namePlayer1",
+                getString(R.string.txtPlayer1)
+        );
+
+        String namePlayer2 = this.preferences.getString(
+                "namePlayer2",
+                getString(R.string.txtPlayer2)
+        );
+
         String texto = (juegoBantumi.getSemillas(6) > 6 * numInicialSemillas)
-                ? "Gana Jugador 1"
-                : "Gana Jugador 2";
+                ? ("Gana" + namePlayer1)
+                : ("Gana" + namePlayer2);
         if (juegoBantumi.getSemillas(6) == 6 * numInicialSemillas) {
             texto = "¡¡¡ EMPATE !!!";
         }
@@ -255,24 +293,22 @@ public class MainActivity extends AppCompatActivity {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
             formattedDateTime = currentDateTime.format(formatter);
         }
-        String winner = getString((juegoBantumi.getSemillas(6) > 6 * numInicialSemillas)
-                ? R.string.txtPlayer1
-                : R.string.txtPlayer2);
+        String winner = (juegoBantumi.getSemillas(6) > 6 * numInicialSemillas)
+                ? namePlayer1
+                : namePlayer2;
 
-        Integer seeds = (juegoBantumi.getSemillas(6) > 6 * numInicialSemillas)
+        int seeds = (juegoBantumi.getSemillas(6) > 6 * numInicialSemillas)
                 ? juegoBantumi.getSemillas(6)
                 : juegoBantumi.getSemillas(13);
 
         final String finalFormattedDateTime = formattedDateTime;
-        final String finalWinner = winner;
-        final Integer finalSeeds = seeds;
 
-        Score score = new Score(finalFormattedDateTime, finalWinner, finalSeeds);
+        Score score = new Score(finalFormattedDateTime, winner, seeds);
         scoreViewModel = new ViewModelProvider(this).get(ScoreViewModel.class);
         try {
             scoreViewModel.insert(score);
         }catch (Exception e) {
-            Log.e("MiW","ERROR" + e.getMessage());
+            Log.e(LOG_TAG,"ERROR" + e.getMessage());
             e.printStackTrace();
         }
         // terminar
